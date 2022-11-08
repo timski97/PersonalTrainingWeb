@@ -13,7 +13,6 @@ import remoteConfig from '@react-native-firebase/remote-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import {getManufacturer} from 'react-native-device-info';
-import {useNavigation} from '@react-navigation/native';
 import OneSignal from 'react-native-onesignal';
 import {ExerciseScreen} from './src/screens/ExerciseScreen';
 import {ChestScreen} from './src/screens/ChestScreen';
@@ -32,7 +31,8 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const [showWebView, setShowWebView] = useState('');
   const [visible, setVisible] = useState(true);
-  const webViewRef = useRef();
+  const [canGoBack, setCanGoBack] = useState(false);
+  const webViewRef = useRef(null);
   const ActivityIndicatorElement = () => {
     return (
       <View style={styles.activityIndicatorStyle}>
@@ -45,34 +45,31 @@ export default function App() {
   };
   useEffect(() => {
     const handleBack = () => {
-      // webViewRef.current?.goBack();
       return true;
     };
-    // console.log(handleBack())
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       handleBack,
     );
     return () => backHandler.remove();
-
   }, []);
-  const handleBackButtonPress = () => {
-    try {
-      webViewRef.current?.goBack();
-    } catch (err) {
-      console.log('[handleBackButtonPress] Error : ', err.message);
-    }
-    // console.log(handleBackButtonPress())
-  };
+
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonPress);
+    BackHandler.addEventListener('hardwareBackPress', HandleBackPressed);
     return () => {
-      BackHandler.removeEventListener(
-        'hardwareBackPress',
-        handleBackButtonPress,
-      );
+      BackHandler.removeEventListener('hardwareBackPress', HandleBackPressed);
     };
-}, []);
+  }, [canGoBack]);
+
+  const HandleBackPressed = () => {
+    if (canGoBack && webViewRef.current) {
+      webViewRef.current.goBack();
+      console.log(webViewRef.current.goBack())
+      return true;
+    }
+
+    return false;
+  };
 
   const loadFire = async () => {
     setVisible(true);
@@ -200,9 +197,10 @@ export default function App() {
         source={{uri: showWebView}}
         style={{flex: 1, width: '100%', height: '100%'}}
         allowFileAccess={true}
-        ref={webViewRef}
         scalesPageToFit={true}
         originWhitelist={['*']}
+        ref={webViewRef}
+        onLoadProgress={event => setCanGoBack(event.nativeEvent.canGoBack)}
       />
       {visible ? <ActivityIndicatorElement /> : null}
     </View>
