@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "372675337952",
+    "project_id": "jullimu-80dad",
+    "storage_bucket": "jullimu-80dad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:372675337952:android:41d9bd3fac6c1dc2eb7a85",
+        "android_client_info": {
+          "package_name": "jollyleon.bk.ents"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "372675337952-o988jea39vfrkku55b77t65jm3ft7k2c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZaHme-nIWS_cm0kCQz6yczzmigcV6Zuo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "372675337952-o988jea39vfrkku55b77t65jm3ft7k2c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
