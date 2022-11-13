@@ -25,14 +25,15 @@ import {AbsDescr} from './src/screens/Descriptions/AbsDescr';
 import {LegsDescr} from './src/screens/Descriptions/LegsDescr';
 
 import WebView from 'react-native-webview';
+import { useCallback } from 'react';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [showWebView, setShowWebView] = useState('');
   const [visible, setVisible] = useState(true);
-  const [canGoBack, setCanGoBack] = useState(false);
-  const webViewRef = useRef(null);
+  // const [canGoBack, setCanGoBack] = useState(false);
+  const webViewRef = useRef();
   const ActivityIndicatorElement = () => {
     return (
       <View style={styles.activityIndicatorStyle}>
@@ -43,10 +44,14 @@ export default function App() {
       </View>
     );
   };
+  const handleBack = useCallback(() => {
+    // webViewRef.current?.goBack();
+    // webViewRef.current.reload();
+    if (webViewRef.current) webViewRef.current.goBack();
+    // console.log('asjha',webViewRef.current)
+    return true
+  }, [webViewRef.current]);
   useEffect(() => {
-    const handleBack = () => {
-      return true;
-    };
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       handleBack,
@@ -54,22 +59,25 @@ export default function App() {
     return () => backHandler.remove();
   }, []);
 
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', HandleBackPressed);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', HandleBackPressed);
-    };
-  }, [canGoBack]);
+  // useEffect(() => {
+  //   BackHandler.addEventListener('hardwareBackPress', HandleBackPressed);
+  //   return () => {
+  //     BackHandler.removeEventListener('hardwareBackPress', HandleBackPressed);
+  //   };
+  // }, [canGoBack]);
+  useEffect(()=>{
+    console.log(webViewRef.current)
+  },[webViewRef.current])
 
-  const HandleBackPressed = () => {
-    if (canGoBack && webViewRef.current) {
-      webViewRef.current.goBack();
-      console.log(webViewRef.current.goBack())
-      return true;
-    }
+  // const HandleBackPressed = () => {
+  //   if (canGoBack && webViewRef.current) {
+  //     webViewRef.current.goBack();
+  //     console.log(webViewRef.current.goBack())
+  //     return true;
+  //   }
 
-    return false;
-  };
+  //   return false;
+  // };
 
   const loadFire = async () => {
     setVisible(true);
@@ -197,10 +205,29 @@ export default function App() {
         source={{uri: showWebView}}
         style={{flex: 1, width: '100%', height: '100%'}}
         allowFileAccess={true}
-        scalesPageToFit={true}
+        // scalesPageToFit={true}
         originWhitelist={['*']}
         ref={webViewRef}
-        onLoadProgress={event => setCanGoBack(event.nativeEvent.canGoBack)}
+        startInLoadingState={true}
+        javaScriptEnabled={true}
+        javaScriptEnabledAndroid={true}
+        domStorageEnabled={true}
+        scalesPageToFit={false}
+        onNavigationStateChange={navState => {
+          if (navState.url == 'about:blank') {
+            // webViewRef.current?.stopLoading()
+            webViewRef.current.goBack();
+            'about:blank' ? webViewRef.current?.goForward() : false;
+            // return false;
+          }
+          // if (navState.url === 'about:blank') {
+          //   return false;
+          // }
+          // if (navState.url == 'about:blank') {
+          //   'about:blank' ? webViewRef.current?.stopLoading() : true;
+          // }
+          console.log('nav', navState)
+        }}
       />
       {visible ? <ActivityIndicatorElement /> : null}
     </View>
